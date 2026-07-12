@@ -566,10 +566,12 @@ export const api = {
         if (urlParams.toString()) url += `?${urlParams.toString()}`;
       }
 
+      const token = localStorage.getItem('af_token');
       const options = {
         method,
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         }
       };
 
