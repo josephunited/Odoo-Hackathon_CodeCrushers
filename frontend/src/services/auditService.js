@@ -1,10 +1,5 @@
 // Audit Service - API calls backed by real backend with localStorage fallback
-const API_BASE = 'http://localhost:8080/api';
-
-const getAuthHeaders = () => ({
-  'Content-Type': 'application/json',
-  ...(localStorage.getItem('af_token') ? { 'Authorization': `Bearer ${localStorage.getItem('af_token')}` } : {})
-});
+import { api } from './api';
 
 // Mock operations helper
 const mock = {
@@ -160,11 +155,8 @@ const mock = {
 export const auditService = {
   create: async (request) => {
     try {
-      const res = await fetch(`${API_BASE}/audits`, {
-        method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(request)
-      });
-      if (!res.ok) { const e = await res.text(); throw new Error(e); }
-      return await res.json();
+      const res = await api.post('/audits', request);
+      return res;
     } catch {
       return await mock.createAuditCycle(request);
     }
@@ -172,10 +164,8 @@ export const auditService = {
 
   getActive: async () => {
     try {
-      const res = await fetch(`${API_BASE}/audits/active`, { headers: getAuthHeaders() });
-      if (res.status === 204) return null;
-      if (!res.ok) throw new Error('Server error');
-      return await res.json();
+      const res = await api.get('/audits/active');
+      return res;
     } catch {
       return await mock.getActiveAuditCycle();
     }
@@ -183,9 +173,8 @@ export const auditService = {
 
   getHistory: async () => {
     try {
-      const res = await fetch(`${API_BASE}/audits/history`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error('Server error');
-      return await res.json();
+      const res = await api.get('/audits/history');
+      return res;
     } catch {
       return await mock.getAuditHistory();
     }
@@ -193,9 +182,8 @@ export const auditService = {
 
   getDetails: async (id) => {
     try {
-      const res = await fetch(`${API_BASE}/audits/${id}`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error('Server error');
-      return await res.json();
+      const res = await api.get(`/audits/${id}`);
+      return res;
     } catch {
       return await mock.getAuditDetails(id);
     }
@@ -203,11 +191,8 @@ export const auditService = {
 
   verifyAsset: async (auditId, assetId, status, notes, verifiedBy) => {
     try {
-      const res = await fetch(`${API_BASE}/audits/${auditId}/verify`, {
-        method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ assetId, status, notes, verifiedBy })
-      });
-      if (!res.ok) { const e = await res.text(); throw new Error(e); }
-      return await res.json();
+      const res = await api.post(`/audits/${auditId}/verify`, { assetId, status, notes, verifiedBy });
+      return res;
     } catch {
       return await mock.verifyAsset(auditId, { assetId, status, notes, verifiedBy });
     }
@@ -215,11 +200,8 @@ export const auditService = {
 
   closeCycle: async (auditId) => {
     try {
-      const res = await fetch(`${API_BASE}/audits/${auditId}/close`, {
-        method: 'POST', headers: getAuthHeaders()
-      });
-      if (!res.ok) { const e = await res.text(); throw new Error(e); }
-      return await res.json();
+      const res = await api.post(`/audits/${auditId}/close`, {});
+      return res;
     } catch {
       return await mock.closeAuditCycle(auditId);
     }

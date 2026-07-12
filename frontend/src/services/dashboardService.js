@@ -1,10 +1,5 @@
 // Dashboard Service - API calls backed by real backend with localStorage fallback
-const API_BASE = 'http://localhost:8080/api';
-
-const getAuthHeaders = () => ({
-  'Content-Type': 'application/json',
-  ...(localStorage.getItem('af_token') ? { 'Authorization': `Bearer ${localStorage.getItem('af_token')}` } : {})
-});
+import { api } from './api';
 
 // Mock Dashboard Summary generator
 const generateMockSummary = () => {
@@ -96,9 +91,8 @@ const generateMockSummary = () => {
 export const dashboardService = {
   getSummary: async () => {
     try {
-      const res = await fetch(`${API_BASE}/dashboard/summary`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error('Server error');
-      return await res.json();
+      const res = await api.get('/dashboard/summary');
+      return res;
     } catch (e) {
       console.warn('[AssetFlow Dashboard Service] Falling back to mock data:', e.message);
       return generateMockSummary();
@@ -106,9 +100,8 @@ export const dashboardService = {
   },
   getRecentActivities: async (limit = 10) => {
     try {
-      const res = await fetch(`${API_BASE}/dashboard/recent-activities?limit=${limit}`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error('Server error');
-      return await res.json();
+      const res = await api.get(`/dashboard/recent-activities?limit=${limit}`);
+      return res;
     } catch (e) {
       console.warn('[AssetFlow Dashboard Service] Falling back to mock activities:', e.message);
       const summary = generateMockSummary();

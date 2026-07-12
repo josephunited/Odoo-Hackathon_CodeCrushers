@@ -53,7 +53,7 @@ export const activityLogService = {
   async getRecentActivity() {
     try {
       const resp = await api.get('/activity-logs/recent');
-      return resp.data;
+      return resp;   // api.exec() returns parsed JSON directly, not { data }
     } catch (_) {
       const logs = getLocalLogs();
       return [...logs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
@@ -78,7 +78,7 @@ export const activityLogService = {
       params.size = size;
 
       const resp = await api.get('/activity-logs', { params });
-      return resp.data;
+      return resp;   // api.exec() returns parsed JSON directly
     } catch (_) {
       // Simulate server-side filtering/pagination in localStorage
       let logs = getLocalLogs();
@@ -115,7 +115,7 @@ export const activityLogService = {
   async getMeta() {
     try {
       const resp = await api.get('/activity-logs/meta');
-      return resp.data;
+      return resp;   // api.exec() returns parsed JSON directly
     } catch (_) {
       const logs = getLocalLogs();
       const actors  = [...new Set(logs.map(l => l.actorUsername).filter(Boolean))].sort();
