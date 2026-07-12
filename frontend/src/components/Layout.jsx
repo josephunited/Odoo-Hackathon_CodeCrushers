@@ -1,15 +1,19 @@
 import React from 'react';
-import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, ChevronRight, UserMinus, UserPlus, Building2, Users, Tag, LogOut } from 'lucide-react';
+import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, ChevronRight, UserMinus, UserPlus, Building2, Users, Tag, LogOut, ClipboardCheck, Activity, FileText } from 'lucide-react';
 
 export default function Layout({ children, currentPage, setCurrentPage, currentUser, onLogout }) {
   const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Monitor },
     { id: 'directory', label: 'Asset Directory', icon: Package },
     { id: 'register', label: 'Register Asset', icon: PlusCircle },
     { id: 'allocate', label: 'Allocate Asset', icon: UserPlus },
     { id: 'transfer', label: 'Transfer Asset', icon: ArrowLeftRight },
     { id: 'return', label: 'Return Asset', icon: UserMinus },
     { id: 'history', label: 'Asset History', icon: History },
-    { id: '__sep__', label: '──── Setup ────', icon: null },
+    { id: 'audits',        label: 'Asset Audits',   icon: ClipboardCheck },
+    { id: 'activity-logs', label: 'Activity Logs',  icon: Activity },
+    { id: 'reports',       label: 'Reports',         icon: FileText },
+    { id: '__sep__',       label: '──── Setup ────', icon: null },
     { id: 'departments', label: 'Departments', icon: Building2 },
     { id: 'employees', label: 'Employees', icon: Users },
     { id: 'categories', label: 'Categories', icon: Tag },

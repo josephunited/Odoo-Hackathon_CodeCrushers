@@ -653,6 +653,13 @@ export const api = {
     listTransfers: (status) => api.exec('/assets/transfer', 'GET', null, status ? { status } : null)
   },
 
+  // ── Generic HTTP convenience methods used by Joseph's services ──────────────
+  // These wrap exec() so that activityLogService, reportService, auditService
+  // can call api.get('/foo') / api.post('/foo', body) without knowing internals.
+  get: (endpoint, options = {}) => api.exec(endpoint, 'GET', null, options?.params || null),
+  post: (endpoint, body) => api.exec(endpoint, 'POST', body, null),
+  put: (endpoint, body) => api.exec(endpoint, 'PUT', body, null),
+
   // Mock-assumed existing endpoints
   employees: {
     list: () => api.exec('/employees'),

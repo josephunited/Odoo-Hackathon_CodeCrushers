@@ -2,6 +2,8 @@ package com.assetflow.service.impl;
 
 import com.assetflow.dto.DashboardDTO;
 import com.assetflow.dto.RecentActivityDTO;
+import com.assetflow.entity.ActivityLog;
+import com.assetflow.repository.ActivityLogRepository;
 import com.assetflow.service.DashboardService;
 import com.assetflow.repository.EmployeeRepository;
 import com.assetflow.repository.DepartmentRepository;
@@ -40,6 +42,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final AssetRepository assetRepository;
     private final AssetTransferRepository assetTransferRepository;
     private final AssetHistoryRepository assetHistoryRepository;
+    private final ActivityLogRepository activityLogRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -118,6 +121,25 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<RecentActivityDTO> getRecentActivities(int limit) {
+        // Read from the unified ActivityLog table — covers ALL modules (Audit, Asset, Booking, Maintenance)
+        List<ActivityLog> logs = activityLogRepository.findTop20ByOrderByTimestampDesc()
+                .stream().limit(limit).collect(Collectors.toList());
+
+        if (!logs.isEmpty()) {
+            return logs.stream()
+                    .map(log -> RecentActivityDTO.builder()
+                            .id(log.getId())
+                            .assetTag(log.getEntityName() != null ? log.getEntityName() : log.getModule())
+                            .assetName(log.getDescription())
+                            .actionType(log.getActionType())
+                            .performedBy(log.getActorUsername())
+                            .details(log.getDescription())
+                            .actionDate(log.getTimestamp())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        // Fallback: if ActivityLog table is empty, read from AssetHistory
         List<AssetHistory> histories = entityManager.createQuery(
                 "SELECT h FROM AssetHistory h JOIN FETCH h.asset ORDER BY h.actionDate DESC", AssetHistory.class)
                 .setMaxResults(limit)

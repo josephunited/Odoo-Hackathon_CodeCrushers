@@ -21,13 +21,27 @@ import TransferAsset from './pages/TransferAsset';
 import ReturnAsset from './pages/ReturnAsset';
 import AssetHistory from './pages/AssetHistory';
 
+// Joseph's Dashboard page
+import Dashboard from './pages/dashboard/Dashboard';
+
+// Joseph's Audit pages
+import AuditList from './pages/audit/AuditList';
+import AuditDetails from './pages/audit/AuditDetails';
+import CreateAudit from './pages/audit/CreateAudit';
+
+// Joseph's Activity Logs page
+import ActivityLogs from './pages/activitylogs/ActivityLogs';
+
+// Joseph's Reports page
+import Reports from './pages/reports/Reports';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
   const [authView, setAuthView] = useState('login'); // 'login' | 'signup'
 
   // Navigation state (shared with asset module)
-  const [currentPage, setCurrentPage] = useState('directory');
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [editAssetId, setEditAssetId] = useState(null);
 
@@ -36,13 +50,17 @@ export default function App() {
   const [empView, setEmpView]   = useState({ mode: 'list', item: null });
   const [catView, setCatView]   = useState({ mode: 'list', item: null });
 
+  // Audit sub-views
+  const [auditView, setAuditView] = useState({ mode: 'list', id: null }); // mode: list | details | create
+
+
   // Handle login/signup success
   const handleLogin = (data) => setCurrentUser(data);
 
   const handleLogout = () => {
     authService.logout();
     setCurrentUser(null);
-    setCurrentPage('directory');
+    setCurrentPage('dashboard');
   };
 
   // Show login or signup if not authenticated
@@ -118,6 +136,40 @@ export default function App() {
           />
         );
 
+      // ── Joseph: Dashboard, Reports & Activity Logs ────────────────────────
+      case 'dashboard':
+        return <Dashboard setCurrentPage={setCurrentPage} />;
+
+      case 'activity-logs':
+        return <ActivityLogs />;
+
+      case 'reports':
+        return <Reports />;
+
+      case 'audits':
+        if (auditView.mode === 'create') {
+          return (
+            <CreateAudit
+              onSave={() => setAuditView({ mode: 'list', id: null })}
+              onCancel={() => setAuditView({ mode: 'list', id: null })}
+            />
+          );
+        }
+        if (auditView.mode === 'details') {
+          return (
+            <AuditDetails
+              auditId={auditView.id}
+              onBack={() => setAuditView({ mode: 'list', id: null })}
+            />
+          );
+        }
+        return (
+          <AuditList
+            onSelectAudit={id => setAuditView({ mode: 'details', id })}
+            onNewAudit={() => setAuditView({ mode: 'create', id: null })}
+          />
+        );
+
       // ── Sooraj: Asset Management ──────────────────────────────────────────
       case 'directory':
         return (
@@ -151,12 +203,7 @@ export default function App() {
       case 'history':
         return <AssetHistory />;
       default:
-        return (
-          <AssetDirectory
-            setCurrentPage={setCurrentPage}
-            setSelectedAssetId={setSelectedAssetId}
-          />
-        );
+        return <Dashboard />;
     }
   };
 
