@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, ChevronRight, UserMinus, UserPlus, Building2, Users, Tag, LogOut } from 'lucide-react';
+import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, ChevronRight, UserMinus, UserPlus, Building2, Users, Tag, LogOut, Calendar, Wrench, Bell } from 'lucide-react';
 
 export default function Layout({ children, currentPage, setCurrentPage, currentUser, onLogout }) {
   const menuItems = [
@@ -9,6 +9,10 @@ export default function Layout({ children, currentPage, setCurrentPage, currentU
     { id: 'transfer', label: 'Transfer Asset', icon: ArrowLeftRight },
     { id: 'return', label: 'Return Asset', icon: UserMinus },
     { id: 'history', label: 'Asset History', icon: History },
+    { id: '__sep_ops__', label: '── Operations ──', icon: null },
+    { id: 'bookings', label: 'Resource Booking', icon: Calendar },
+    { id: 'maintenance', label: 'Maintenance Log', icon: Wrench },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: '__sep__', label: '──── Setup ────', icon: null },
     { id: 'departments', label: 'Departments', icon: Building2 },
     { id: 'employees', label: 'Employees', icon: Users },

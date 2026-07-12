@@ -21,6 +21,15 @@ import TransferAsset from './pages/TransferAsset';
 import ReturnAsset from './pages/ReturnAsset';
 import AssetHistory from './pages/AssetHistory';
 
+// Anna's Bookings, Maintenance, & Notifications pages
+import BookingCalendar from './pages/booking/BookingCalendar';
+import BookingForm from './pages/booking/BookingForm';
+import BookingHistory from './pages/booking/BookingHistory';
+import MaintenanceList from './pages/maintenance/MaintenanceList';
+import MaintenanceRequest from './pages/maintenance/MaintenanceRequest';
+import MaintenanceDetails from './pages/maintenance/MaintenanceDetails';
+import NotificationCenter from './pages/notifications/NotificationCenter';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
@@ -30,6 +39,10 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('directory');
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [editAssetId, setEditAssetId] = useState(null);
+
+  // Anna's module state
+  const [editBookingId, setEditBookingId] = useState(null);
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState(null);
 
   // Organization setup sub-views
   const [deptView, setDeptView] = useState({ mode: 'list', item: null }); // mode: list | form
@@ -150,6 +163,72 @@ export default function App() {
         return <ReturnAsset />;
       case 'history':
         return <AssetHistory />;
+
+      // ── Anna: Resource Booking ─────────────────────────────────────────────
+      case 'bookings':
+        return (
+          <BookingHistory
+            currentUser={currentUser}
+            setCurrentPage={setCurrentPage}
+            onNew={() => {
+              setEditBookingId(null);
+              setCurrentPage('booking-form');
+            }}
+            onEdit={(id) => {
+              setEditBookingId(id);
+              setCurrentPage('booking-form');
+            }}
+          />
+        );
+      case 'booking-calendar':
+        return (
+          <BookingCalendar
+            setCurrentPage={setCurrentPage}
+            setSelectedAssetId={setSelectedAssetId}
+          />
+        );
+      case 'booking-form':
+        return (
+          <BookingForm
+            bookingId={editBookingId}
+            onSave={() => setCurrentPage('bookings')}
+            onCancel={() => setCurrentPage('bookings')}
+          />
+        );
+
+      // ── Anna: Maintenance ──────────────────────────────────────────────────
+      case 'maintenance':
+        return (
+          <MaintenanceList
+            setCurrentPage={setCurrentPage}
+            onNew={() => setCurrentPage('maintenance-form')}
+            onSelect={(id) => {
+              setSelectedMaintenanceId(id);
+              setCurrentPage('maintenance-details');
+            }}
+          />
+        );
+      case 'maintenance-details':
+        return (
+          <MaintenanceDetails
+            recordId={selectedMaintenanceId}
+            currentUser={currentUser}
+            onSave={() => setCurrentPage('maintenance')}
+            onCancel={() => setCurrentPage('maintenance')}
+          />
+        );
+      case 'maintenance-form':
+        return (
+          <MaintenanceRequest
+            onSave={() => setCurrentPage('maintenance')}
+            onCancel={() => setCurrentPage('maintenance')}
+          />
+        );
+
+      // ── Anna: Notifications ────────────────────────────────────────────────
+      case 'notifications':
+        return <NotificationCenter currentUser={currentUser} />;
+
       default:
         return (
           <AssetDirectory
