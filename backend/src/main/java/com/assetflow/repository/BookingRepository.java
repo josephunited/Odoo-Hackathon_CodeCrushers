@@ -8,10 +8,28 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Collection;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.status = :status AND :now BETWEEN b.startTime AND b.endTime")
     long countActiveBookings(@Param("status") BookingStatus status, @Param("now") LocalDateTime now);
+
+    List<Booking> findByEmployeeId(Long employeeId);
+
+    List<Booking> findByAssetId(Long assetId);
+
+    @Query("SELECT b FROM Booking b WHERE b.asset.id = :assetId " +
+           "AND b.status IN :statuses " +
+           "AND (:excludeBookingId IS NULL OR b.id <> :excludeBookingId) " +
+           "AND b.startTime < :endTime AND b.endTime > :startTime")
+    List<Booking> findOverlappingBookings(
+            @Param("assetId") Long assetId,
+            @Param("statuses") Collection<BookingStatus> statuses,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
+            @Param("excludeBookingId") Long excludeBookingId
+    );
 }
