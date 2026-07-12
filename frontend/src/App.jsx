@@ -24,6 +24,11 @@ import AssetHistory from './pages/AssetHistory';
 // Joseph's Dashboard page
 import Dashboard from './pages/dashboard/Dashboard';
 
+// Joseph's Audit pages
+import AuditList from './pages/audit/AuditList';
+import AuditDetails from './pages/audit/AuditDetails';
+import CreateAudit from './pages/audit/CreateAudit';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
@@ -38,6 +43,10 @@ export default function App() {
   const [deptView, setDeptView] = useState({ mode: 'list', item: null }); // mode: list | form
   const [empView, setEmpView]   = useState({ mode: 'list', item: null });
   const [catView, setCatView]   = useState({ mode: 'list', item: null });
+
+  // Audit sub-views
+  const [auditView, setAuditView] = useState({ mode: 'list', id: null }); // mode: list | details | create
+
 
   // Handle login/signup success
   const handleLogin = (data) => setCurrentUser(data);
@@ -124,6 +133,30 @@ export default function App() {
       // ── Joseph: Dashboard & Reports ────────────────────────────────────────
       case 'dashboard':
         return <Dashboard />;
+
+      case 'audits':
+        if (auditView.mode === 'create') {
+          return (
+            <CreateAudit
+              onSave={() => setAuditView({ mode: 'list', id: null })}
+              onCancel={() => setAuditView({ mode: 'list', id: null })}
+            />
+          );
+        }
+        if (auditView.mode === 'details') {
+          return (
+            <AuditDetails
+              auditId={auditView.id}
+              onBack={() => setAuditView({ mode: 'list', id: null })}
+            />
+          );
+        }
+        return (
+          <AuditList
+            onSelectAudit={id => setAuditView({ mode: 'details', id })}
+            onNewAudit={() => setAuditView({ mode: 'create', id: null })}
+          />
+        );
 
       // ── Sooraj: Asset Management ──────────────────────────────────────────
       case 'directory':
