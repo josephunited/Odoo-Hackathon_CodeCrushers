@@ -3,6 +3,7 @@ import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, Chevr
 
 export default function Layout({ children, currentPage, setCurrentPage, currentUser, onLogout }) {
   const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Monitor },
     { id: 'directory', label: 'Asset Directory', icon: Package },
     { id: 'register', label: 'Register Asset', icon: PlusCircle },
     { id: 'allocate', label: 'Allocate Asset', icon: UserPlus },

@@ -21,13 +21,16 @@ import TransferAsset from './pages/TransferAsset';
 import ReturnAsset from './pages/ReturnAsset';
 import AssetHistory from './pages/AssetHistory';
 
+// Joseph's Dashboard page
+import Dashboard from './pages/dashboard/Dashboard';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
   const [authView, setAuthView] = useState('login'); // 'login' | 'signup'
 
   // Navigation state (shared with asset module)
-  const [currentPage, setCurrentPage] = useState('directory');
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [editAssetId, setEditAssetId] = useState(null);
 
@@ -42,7 +45,7 @@ export default function App() {
   const handleLogout = () => {
     authService.logout();
     setCurrentUser(null);
-    setCurrentPage('directory');
+    setCurrentPage('dashboard');
   };
 
   // Show login or signup if not authenticated
@@ -118,6 +121,10 @@ export default function App() {
           />
         );
 
+      // ── Joseph: Dashboard & Reports ────────────────────────────────────────
+      case 'dashboard':
+        return <Dashboard />;
+
       // ── Sooraj: Asset Management ──────────────────────────────────────────
       case 'directory':
         return (
@@ -151,12 +158,7 @@ export default function App() {
       case 'history':
         return <AssetHistory />;
       default:
-        return (
-          <AssetDirectory
-            setCurrentPage={setCurrentPage}
-            setSelectedAssetId={setSelectedAssetId}
-          />
-        );
+        return <Dashboard />;
     }
   };
 
