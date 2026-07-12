@@ -5,7 +5,7 @@ import QRModal from '../components/QRModal';
 import { 
   ArrowLeft, Edit, Trash2, Calendar, DollarSign, MapPin, 
   User, Send, RefreshCw, QrCode, AlertTriangle, ShieldCheck,
-  UserPlus, UserMinus, ArrowLeftRight, Clock, Info
+  UserPlus, UserMinus, ArrowLeftRight, Clock, Info, Wrench
 } from 'lucide-react';
 
 export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }) {
@@ -23,6 +23,7 @@ export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }
   const [returnCondition, setReturnCondition] = useState('');
   const [transferEmpId, setTransferEmpId] = useState('');
   const [transferRemarks, setTransferRemarks] = useState('');
+  const [maintenanceDesc, setMaintenanceDesc] = useState('');
   
   // Submitting States
   const [submitting, setSubmitting] = useState(false);
@@ -99,6 +100,7 @@ export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }
     setExpectedReturnDate('');
     setReturnNotes('');
     setTransferRemarks('');
+    setMaintenanceDesc('');
   };
 
   const handleAllocate = async (e) => {
@@ -169,6 +171,28 @@ export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }
       }, 1200);
     } catch (err) {
       setErrorMsg(err.message || 'Failed to request transfer.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleMaintenanceRequest = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setErrorMsg('');
+    try {
+      await api.maintenance.report({
+        assetId: parseInt(assetId),
+        reportedBy: 1, // Hackathon stub for active user
+        description: maintenanceDesc
+      });
+      setSuccessMsg('Maintenance requested successfully!');
+      setTimeout(() => {
+        closeModal();
+        loadAssetDetails();
+      }, 1200);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to request maintenance.');
     } finally {
       setSubmitting(false);
     }
@@ -317,6 +341,16 @@ export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }
                 >
                   <UserPlus className="w-4 h-4" />
                   Allocate Resource
+                </button>
+              )}
+
+              {asset.status === 'AVAILABLE' && (
+                <button
+                  onClick={() => openModal('maintenance')}
+                  className="flex items-center justify-center gap-2 py-2 px-4 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold shadow-lg transition-all w-full sm:w-auto"
+                >
+                  <Wrench className="w-4 h-4" />
+                  Request Repair
                 </button>
               )}
 
@@ -574,6 +608,42 @@ export default function AssetDetails({ assetId, setCurrentPage, setEditAssetId }
               </button>
               <button type="submit" disabled={submitting} className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-primary-600/20">
                 {submitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                Submit Request
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* MAINTENANCE MODAL */}
+      {activeModal === 'maintenance' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <form onSubmit={handleMaintenanceRequest} className="w-full max-w-md glass-panel p-6 rounded-2xl border border-cardborder animate-fade-in space-y-5">
+            <h3 className="font-bold text-lg text-white">Request Maintenance / Repair</h3>
+            
+            {errorMsg && <p className="text-xs text-rose-400 bg-rose-500/10 p-3 rounded-lg">{errorMsg}</p>}
+            {successMsg && <p className="text-xs text-emerald-400 bg-emerald-500/10 p-3 rounded-lg">{successMsg}</p>}
+
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-gray-400 font-semibold uppercase">Issue Description</label>
+                <textarea
+                  value={maintenanceDesc}
+                  onChange={e => setMaintenanceDesc(e.target.value)}
+                  rows="3"
+                  placeholder="Describe what needs fixing..."
+                  className="w-full px-4 py-2.5 rounded-xl glass-input text-sm resize-none"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-white/5 pt-4">
+              <button type="button" onClick={closeModal} className="px-4 py-2 bg-white/5 text-gray-300 rounded-xl text-xs font-semibold border border-white/5">
+                Cancel
+              </button>
+              <button type="submit" disabled={submitting} className="flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold shadow-lg">
+                {submitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Wrench className="w-3.5 h-3.5" />}
                 Submit Request
               </button>
             </div>

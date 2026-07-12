@@ -669,5 +669,39 @@ export const api = {
   },
   departments: {
     list: () => api.exec('/departments'),
+  },
+  bookings: {
+    create: (data) => api.exec('/api/bookings', 'POST', data),
+    listByEmployee: (employeeId) => api.exec(`/api/bookings/employee/${employeeId}`, 'GET'),
+    cancel: (id, employeeId) => api.exec(`/api/bookings/${id}/cancel`, 'PUT', null, { employeeId })
+  },
+  maintenance: {
+    report: (data) => api.exec('/api/maintenance', 'POST', data),
+    complete: (id, cost) => api.exec(`/api/maintenance/${id}/complete`, 'POST', null, { cost }),
+    list: () => api.exec('/api/maintenance', 'GET')
+  },
+  files: {
+    upload: async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      // We must use fetch or axios directly because our api.exec might stringify JSON
+      // But we can just use axiosInstance directly, wait api.exec uses fetch inside... 
+      // I will just use raw fetch:
+      const res = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      return await res.json();
+    }
+  },
+  notifications: {
+    getUnread: (employeeId) => api.exec(`/api/notifications/employee/${employeeId}`),
+    markAsRead: (id) => api.exec(`/api/notifications/${id}/read`, 'POST')
+  },
+  search: {
+    query: (q) => api.exec(`/api/search?q=${encodeURIComponent(q)}`)
   }
 };

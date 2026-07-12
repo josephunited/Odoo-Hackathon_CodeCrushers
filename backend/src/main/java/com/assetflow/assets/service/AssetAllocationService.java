@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +100,20 @@ public class AssetAllocationService {
         historyService.logHistory(asset, "RETURN", request.getPerformedBy(), historyDetails);
 
         return updatedAllocation;
+    }
+
+    @Scheduled(cron = "0 0 1 * * ?") // Run at 1 AM every day
+    @Transactional
+    public void markOverdueAllocations() {
+        LocalDate today = LocalDate.now();
+        List<AssetAllocation> activeAllocations = allocationRepository.findByStatusAndExpectedReturnDateBefore(AllocationStatus.ACTIVE, today);
+        
+        for (AssetAllocation allocation : activeAllocations) {
+            allocation.setStatus(AllocationStatus.OVERDUE);
+            allocationRepository.save(allocation);
+
+            String historyDetails = String.format("Allocation overdue. Expected return was: %s", allocation.getExpectedReturnDate());
+            historyService.logHistory(allocation.getAsset(), "OVERDUE", "System", historyDetails);
+        }
     }
 }

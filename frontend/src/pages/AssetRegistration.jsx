@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Save, RefreshCw, Undo, Eye, Tag, AlertCircle, Sparkles } from 'lucide-react';
+import { Save, RefreshCw, Undo, Eye, Tag, AlertCircle, Sparkles, UploadCloud } from 'lucide-react';
 
 const conditionOptions = ['NEW', 'GOOD', 'FAIR', 'POOR', 'DAMAGED'];
 
@@ -29,6 +29,7 @@ export default function AssetRegistration({ editAssetId, setEditAssetId, setCurr
     status: 'AVAILABLE'
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -84,8 +85,15 @@ export default function AssetRegistration({ editAssetId, setEditAssetId, setCurr
     setSuccessMsg('');
 
     try {
+      let finalImageUrl = formData.imageUrl;
+      if (selectedFile) {
+        const uploadResult = await api.files.upload(selectedFile);
+        finalImageUrl = 'http://localhost:8080' + uploadResult.url; 
+      }
+
       const payload = {
         ...formData,
+        imageUrl: finalImageUrl,
         purchaseCost: parseFloat(formData.purchaseCost) || 0
       };
 
@@ -265,6 +273,25 @@ export default function AssetRegistration({ editAssetId, setEditAssetId, setCurr
                 onChange={e => setFormData({ ...formData, location: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
               />
+            </div>
+
+            {/* File Upload Option */}
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-xs text-gray-400 font-semibold uppercase flex items-center gap-1.5">
+                <UploadCloud className="w-3.5 h-3.5" />
+                Upload Custom Image
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setSelectedFile(e.target.files[0])}
+                  className="w-full px-4 py-2.5 rounded-xl glass-input text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary-500/10 file:text-primary-400 hover:file:bg-primary-500/20"
+                />
+                {formData.imageUrl && !selectedFile && (
+                  <img src={formData.imageUrl} alt="Current" className="w-12 h-12 rounded object-cover border border-white/10" />
+                )}
+              </div>
             </div>
 
             {/* Image Preset selection */}

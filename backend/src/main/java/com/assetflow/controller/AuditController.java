@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/audits")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 public class AuditController {
 
     private final AuditService auditService;

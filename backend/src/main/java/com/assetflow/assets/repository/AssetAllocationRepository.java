@@ -17,4 +17,6 @@ public interface AssetAllocationRepository extends JpaRepository<AssetAllocation
     List<AssetAllocation> findByAssetIdOrderByAllocationDateDesc(Long assetId);
     
     boolean existsByAssetAndStatus(Asset asset, AllocationStatus status);
+
+    List<AssetAllocation> findByStatusAndExpectedReturnDateBefore(AllocationStatus status, java.time.LocalDate date);
 }

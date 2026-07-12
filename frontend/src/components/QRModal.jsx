@@ -1,60 +1,17 @@
 import React, { useRef } from 'react';
 import { X, QrCode, Printer, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function QRModal({ asset, isOpen, onClose }) {
   if (!isOpen || !asset) return null;
   
   const qrRef = useRef(null);
 
-  // Generate a premium faux-QR code grid based on the asset's attributes
+  const qrValue = `assetflow://asset/${asset.id}`;
   const renderMockQRGrid = () => {
-    const size = 21; // 21x21 QR matrix
-    const grid = [];
-    const seed = asset.assetTag.charCodeAt(3) + asset.serialNumber.charCodeAt(0);
-    
-    for (let r = 0; r < size; r++) {
-      const row = [];
-      for (let c = 0; c < size; c++) {
-        // Standard QR code position detection patterns (corners)
-        const isFinderPattern = 
-          (r < 7 && c < 7) || // Top-left
-          (r < 7 && c >= size - 7) || // Top-right
-          (r >= size - 7 && c < 7); // Bottom-left
-          
-        if (isFinderPattern) {
-          // Render finder pattern box outline & center dot
-          const isBorder = r === 0 || r === 6 || c === 0 || c === 6 || 
-                           (r < 7 && c === size - 7) || (r < 7 && c === size - 1) ||
-                           (r === 0 && c >= size - 7) || (r === 6 && c >= size - 7) ||
-                           (r === size - 7 && c < 7) || (r === size - 1 && c < 7) ||
-                           (r >= size - 7 && c === 0) || (r >= size - 7 && c === 6);
-          const isCenter = (r >= 2 && r <= 4 && c >= 2 && c <= 4) ||
-                           (r >= 2 && r <= 4 && c >= size - 5 && c <= size - 3) ||
-                           (r >= size - 5 && r <= size - 3 && c >= 2 && c <= 4);
-                           
-          row.push(isBorder || isCenter);
-        } else {
-          // Faux-random matrix based on coordinates and asset attributes
-          const hash = Math.sin(r * 12.9898 + c * 78.233 + seed) * 43758.5453;
-          row.push((hash - Math.floor(hash)) > 0.45);
-        }
-      }
-      grid.push(row);
-    }
-    
     return (
-      <div 
-        className="grid gap-[1px] bg-white p-4 rounded-xl border border-gray-200 shadow-md"
-        style={{ gridTemplateColumns: 'repeat(21, minmax(0, 1fr))' }}
-      >
-        {grid.flatMap((row, r) => 
-          row.map((cell, c) => (
-            <div 
-              key={`${r}-${c}`} 
-              className={`w-2.5 h-2.5 rounded-[1px] ${cell ? 'bg-gray-900' : 'bg-transparent'}`} 
-            />
-          ))
-        )}
+      <div className="p-4 bg-white rounded-xl shadow-md border border-gray-200">
+        <QRCodeSVG value={qrValue} size={200} level="H" includeMargin={true} />
       </div>
     );
   };

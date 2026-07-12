@@ -20,6 +20,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByEmployeeId(Long employeeId);
 
     List<Booking> findByAssetId(Long assetId);
+    
+    java.util.List<Booking> findByEmployeeIdOrderByStartTimeDesc(Long employeeId);
 
     @Query("SELECT b FROM Booking b WHERE b.asset.id = :assetId " +
            "AND b.status IN :statuses " +
@@ -31,5 +33,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime,
             @Param("excludeBookingId") Long excludeBookingId
+    );
+
+    @Query("SELECT b FROM Booking b WHERE b.asset.id = :assetId AND b.status IN :statuses AND (b.startTime < :endTime AND b.endTime > :startTime)")
+    java.util.List<Booking> findOverlappingBookingsSimple(
+            @Param("assetId") Long assetId,
+            @Param("statuses") java.util.List<BookingStatus> statuses,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
     );
 }

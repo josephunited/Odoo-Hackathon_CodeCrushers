@@ -78,9 +78,18 @@ export default function Login({ onLogin, onSwitchToSignup }) {
             />
           </div>
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', marginBottom: '6px' }}>
-              Password
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>
+                Password
+              </label>
+              <button 
+                type="button"
+                onClick={() => alert('Please contact your IT administrator to reset your password.')}
+                style={{ background: 'none', border: 'none', color: '#818cf8', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+              >
+                Forgot password?
+              </button>
+            </div>
             <input
               id="login-password"
               type="password"

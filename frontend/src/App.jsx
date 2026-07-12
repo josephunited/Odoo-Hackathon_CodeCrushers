@@ -23,6 +23,8 @@ import AssetHistory from './pages/AssetHistory';
 
 // Joseph's Dashboard page
 import Dashboard from './pages/dashboard/Dashboard';
+import Bookings from './pages/Bookings';
+import MaintenanceBoard from './pages/MaintenanceBoard';
 
 // Joseph's Audit pages
 import AuditList from './pages/audit/AuditList';
@@ -139,6 +141,12 @@ export default function App() {
       // ── Joseph: Dashboard, Reports & Activity Logs ────────────────────────
       case 'dashboard':
         return <Dashboard setCurrentPage={setCurrentPage} />;
+      
+      case 'bookings':
+        return <Bookings />;
+        
+      case 'maintenance':
+        return <MaintenanceBoard />;
 
       case 'activity-logs':
         return <ActivityLogs />;
