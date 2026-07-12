@@ -138,7 +138,7 @@ export default function App() {
 
       // ── Joseph: Dashboard, Reports & Activity Logs ────────────────────────
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard setCurrentPage={setCurrentPage} />;
 
       case 'activity-logs':
         return <ActivityLogs />;

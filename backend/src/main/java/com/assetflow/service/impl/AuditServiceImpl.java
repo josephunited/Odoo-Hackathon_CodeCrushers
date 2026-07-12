@@ -10,6 +10,7 @@ import com.assetflow.entity.AuditItem;
 import com.assetflow.entity.AuditStatus;
 import com.assetflow.entity.VerificationStatus;
 import com.assetflow.repository.AuditRepository;
+import com.assetflow.service.ActivityLogService;
 import com.assetflow.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class AuditServiceImpl implements AuditService {
     private final AuditRepository auditRepository;
     private final AssetRepository assetRepository;
     private final AssetHistoryRepository assetHistoryRepository;
+    private final ActivityLogService activityLogService;
 
     @Override
     public AuditDTO createAuditCycle(String name, LocalDate startDate, LocalDate endDate, Long auditorId, String auditorName) {
@@ -61,6 +63,13 @@ public class AuditServiceImpl implements AuditService {
         audit.setAuditItems(items);
 
         Audit savedAudit = auditRepository.save(audit);
+
+        // ── Integration: publish to central Activity Log ──────────────────────
+        activityLogService.log(
+                "AUDIT", "AUDIT_CREATED",
+                "Audit cycle '" + name + "' started with " + items.size() + " assets.",
+                auditorName, "Audit", savedAudit.getId(), name);
+
         return mapToDTO(savedAudit);
     }
 
@@ -140,6 +149,13 @@ public class AuditServiceImpl implements AuditService {
                 .build();
         assetHistoryRepository.save(history);
 
+        // ── Integration: publish to central Activity Log ──────────────────────
+        activityLogService.log(
+                "AUDIT", "AUDIT_" + status.name(),
+                "Asset " + asset.getAssetTag() + " marked " + status.name()
+                        + " in audit '" + audit.getName() + "'.",
+                verifiedBy, "Asset", asset.getId(), asset.getAssetTag());
+
         Audit savedAudit = auditRepository.save(audit);
         return mapToDTO(savedAudit);
     }
@@ -158,6 +174,13 @@ public class AuditServiceImpl implements AuditService {
         audit.setCompletedDate(LocalDate.now());
 
         Audit savedAudit = auditRepository.save(audit);
+
+        // ── Integration: publish to central Activity Log ──────────────────────
+        activityLogService.log(
+                "AUDIT", "AUDIT_CLOSED",
+                "Audit cycle '" + audit.getName() + "' closed.",
+                audit.getAuditorName(), "Audit", savedAudit.getId(), audit.getName());
+
         return mapToDTO(savedAudit);
     }
 

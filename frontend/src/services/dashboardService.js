@@ -41,22 +41,40 @@ const generateMockSummary = () => {
     assetsByCategory[a.category] = (assetsByCategory[a.category] || 0) + 1;
   });
 
-  // Map history to recent activities DTO
-  const recentActivities = history
-    .slice(-5)
-    .reverse()
-    .map(h => {
-      const asset = assets.find(a => a.id === h.assetId) || {};
-      return {
-        id: h.id,
-        assetTag: asset.assetTag || 'AF-XXXX',
-        assetName: asset.name || 'Unknown Asset',
-        actionType: h.actionType,
-        performedBy: h.performedBy || 'System',
-        details: h.details,
-        actionDate: h.actionDate
-      };
-    });
+  // Map activity logs → recent activities DTO (prefer unified log, fall back to asset history)
+  const activityLogs = JSON.parse(localStorage.getItem('af_activity_logs') || '[]');
+  let recentActivities;
+  if (activityLogs.length > 0) {
+    recentActivities = [...activityLogs]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 5)
+      .map(log => ({
+        id: log.id,
+        assetTag: log.entityName || log.module,
+        assetName: log.description,
+        actionType: log.actionType,
+        performedBy: log.actorUsername || 'System',
+        details: log.description,
+        actionDate: log.timestamp
+      }));
+  } else {
+    // Fallback to AssetHistory mock
+    recentActivities = history
+      .slice(-5)
+      .reverse()
+      .map(h => {
+        const asset = assets.find(a => a.id === h.assetId) || {};
+        return {
+          id: h.id,
+          assetTag: asset.assetTag || 'AF-XXXX',
+          assetName: asset.name || 'Unknown Asset',
+          actionType: h.actionType,
+          performedBy: h.performedBy || 'System',
+          details: h.details,
+          actionDate: h.actionDate
+        };
+      });
+  }
 
   return {
     totalAssets,
