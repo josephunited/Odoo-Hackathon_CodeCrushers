@@ -29,6 +29,9 @@ import AuditList from './pages/audit/AuditList';
 import AuditDetails from './pages/audit/AuditDetails';
 import CreateAudit from './pages/audit/CreateAudit';
 
+// Joseph's Activity Logs page
+import ActivityLogs from './pages/activitylogs/ActivityLogs';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
@@ -130,9 +133,12 @@ export default function App() {
           />
         );
 
-      // ── Joseph: Dashboard & Reports ────────────────────────────────────────
+      // ── Joseph: Dashboard, Reports & Activity Logs ────────────────────────
       case 'dashboard':
         return <Dashboard />;
+
+      case 'activity-logs':
+        return <ActivityLogs />;
 
       case 'audits':
         if (auditView.mode === 'create') {
