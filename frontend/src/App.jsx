@@ -32,6 +32,9 @@ import CreateAudit from './pages/audit/CreateAudit';
 // Joseph's Activity Logs page
 import ActivityLogs from './pages/activitylogs/ActivityLogs';
 
+// Joseph's Reports page
+import Reports from './pages/reports/Reports';
+
 export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
@@ -139,6 +142,9 @@ export default function App() {
 
       case 'activity-logs':
         return <ActivityLogs />;
+
+      case 'reports':
+        return <Reports />;
 
       case 'audits':
         if (auditView.mode === 'create') {
