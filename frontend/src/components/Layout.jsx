@@ -1,15 +1,22 @@
 import React from 'react';
-import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, ShieldAlert, Monitor, ChevronRight, UserMinus, UserPlus } from 'lucide-react';
+import { Package, PlusCircle, UserCheck, ArrowLeftRight, History, Monitor, ChevronRight, UserMinus, UserPlus, Building2, Users, Tag, LogOut } from 'lucide-react';
 
-export default function Layout({ children, currentPage, setCurrentPage }) {
+export default function Layout({ children, currentPage, setCurrentPage, currentUser, onLogout }) {
   const menuItems = [
     { id: 'directory', label: 'Asset Directory', icon: Package },
     { id: 'register', label: 'Register Asset', icon: PlusCircle },
     { id: 'allocate', label: 'Allocate Asset', icon: UserPlus },
     { id: 'transfer', label: 'Transfer Asset', icon: ArrowLeftRight },
     { id: 'return', label: 'Return Asset', icon: UserMinus },
-    { id: 'history', label: 'Asset History', icon: History }
+    { id: 'history', label: 'Asset History', icon: History },
+    { id: '__sep__', label: '──── Setup ────', icon: null },
+    { id: 'departments', label: 'Departments', icon: Building2 },
+    { id: 'employees', label: 'Employees', icon: Users },
+    { id: 'categories', label: 'Categories', icon: Tag },
   ];
+
+  const user = currentUser || { username: 'User' };
+  const initials = (user.username || 'U').slice(0, 2).toUpperCase();
 
   return (
     <div className="flex min-h-screen bg-background text-gray-100 font-sans">
@@ -31,6 +38,13 @@ export default function Layout({ children, currentPage, setCurrentPage }) {
           {/* Navigation */}
           <nav className="p-4 space-y-1.5">
             {menuItems.map(item => {
+              if (item.id === '__sep__') {
+                return (
+                  <div key="sep" style={{ padding: '8px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em', fontWeight: 600, marginTop: '8px' }}>
+                    {item.label}
+                  </div>
+                );
+              }
               const Icon = item.icon;
               const isActive = currentPage === item.id || (item.id === 'directory' && currentPage === 'details');
               return (
@@ -55,12 +69,18 @@ export default function Layout({ children, currentPage, setCurrentPage }) {
         <div className="p-4 border-t border-white/5 bg-gray-950/20">
           <div className="flex items-center gap-3 p-2 rounded-xl">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-primary-500 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/10 text-sm">
-              SS
+              {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate">Sooraj S</p>
-              <p className="text-[10px] text-gray-400 truncate">Asset Module Owner</p>
+              <p className="text-xs font-semibold text-white truncate">{user.username}</p>
+              <p className="text-[10px] text-gray-400 truncate">AssetFlow User</p>
             </div>
+            {onLogout && (
+              <button onClick={onLogout} title="Logout"
+                className="text-gray-500 hover:text-red-400 transition-colors" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </aside>
